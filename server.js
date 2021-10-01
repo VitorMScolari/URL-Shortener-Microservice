@@ -83,7 +83,7 @@ app.post('/api/shorturl', bodyParser.urlencoded({extended: false}), (req, res) =
 app.get('/api/shorturl/:input', (req, res) => {
   let input = req.params.input
 
-  Url.findOne({short: input}, (err, result) => {
+  Url.findOne({short_url: input}, (err, result) => {
     if(!err && result != undefined) {
       res.redirect(result.original_url);
     } else {
