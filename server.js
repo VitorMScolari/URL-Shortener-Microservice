@@ -45,26 +45,39 @@ app.post('/api/shorturl', bodyParser.urlencoded({extended: false}), (req, res) =
     if (!error && result != undefined) {
       res.json({ original_url : result.original_url, short_url : result.short_url});
     } else {
-        Url.findOne({}).sort({short_url: 'desc'}).exec((error, result) => {
+        Url.findOne({}).sort({short_url: 'desc'}).exec((error, urlResult) => {
           if (!error) {
-            let newShort = result.short_url + 1;
-          
-
-        Url.findOneAndUpdate({original_url: inputUrl}, 
-        {original_url: inputUrl, short_url: newShort }, 
-        {new: true, upsert: true },
-        (err, savedUrl) => {
-          if(!err) {
-            res.json({ original_url : savedUrl.inputUrl, short_url : newShort});
+            if (urlResult == null) {
+              let short_url = 1
+                  Url.findOneAndUpdate({original_url: inputUrl}, 
+                  {original_url: inputUrl, short_url: short_url }, 
+                  {new: true, upsert: true },
+                  (err, savedUrl) => {
+                  if(!err) {
+                    res.json({ original_url : urlResult.inputUrl, short_url : short_url});
+                  }
+                }
+              )
+            } else {
+              console.log(urlResult)
+              let newShort = urlResult.short_url + 1;
+    
+              Url.findOneAndUpdate({original_url: inputUrl}, 
+              {original_url: inputUrl, short_url: newShort }, 
+              {new: true, upsert: true },
+              (err, savedUrl) => {
+                if(!err) {
+                  res.json({ original_url : inputUrl, short_url : newShort});
+                }
+              }
+            )
           }
-        }
-      )
-     }
+      }
     })
-    }
+  }
   })
 
-  })
+})
 
 
 app.get('/api/shorturl/:input', (req, res) => {
